@@ -1,0 +1,4 @@
+../Core/Src/i2c_dev.c:12:6:MPU6050_init	40	static
+../Core/Src/i2c_dev.c:58:6:MPU6050_getGyroValues	40	static
+../Core/Src/i2c_dev.c:71:6:MPU6050_getAccelValues	40	static
+../Core/Src/i2c_dev.c:85:6:MPU6050_updateAngles	32	static
