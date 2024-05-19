@@ -126,7 +126,6 @@ int main(void) {
 	uint16_t calibration;
 	uint16_t sample_amount = 1000;
 	float gyro_offset[3] = { 0, 0, 0 };
-	float accel_offset[3] = { +0.055, -0.03, -0.1 }; // accel offset is measured manually
 
 	for (calibration = 0; calibration < sample_amount; calibration++) {
 		MPU6050_getGyroValues(Rec_data_raw); // get gyro values
@@ -163,25 +162,8 @@ int main(void) {
 //		}
 //
 //		tm = HAL_GetTick();
-		MPU6050_getAccelValues(Rec_data_raw);
-		for (uint8_t i = 0; i < 3; i++) {
-			angles_accel_raw[i] = (float) Rec_data_raw[i] / 8192
-					- accel_offset[i];
-		}
-		angles_accel[0] = atan(
-				angles_accel_raw[1]
-						/ sqrt(
-								angles_accel_raw[0] * angles_accel_raw[0]
-										+ angles_accel_raw[2]
-												* angles_accel_raw[2])) * M_1_PI
-				* 180;
-		angles_accel[1] = -atan(
-				angles_accel_raw[0]
-						/ sqrt(
-								angles_accel_raw[1] * angles_accel_raw[1]
-										+ angles_accel_raw[2]
-												* angles_accel_raw[2])) * M_1_PI
-				* 180;
+
+
 		CDC_Transmit_FS(angles_accel_raw, sizeof(angles_accel_raw));
 
 

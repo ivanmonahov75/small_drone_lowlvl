@@ -3,10 +3,10 @@
 // inculdes
 #include "main.h"
 #include "i2c_dev.h"
-
+#include <math.h>
 // remembered values
 I2C_HandleTypeDef *MPU6050_hi2c;
-int32_t gyro_offset[3] = { -21, -4, 0 }; // TODO: add auto calibration
+const static float accel_offset[3] = { +0.055, -0.03, -0.1 }; // accel offset is measured manually
 
 // just init
 void MPU6050_init(I2C_HandleTypeDef *hi2c, uint8_t sampling_rate,
@@ -40,7 +40,8 @@ void MPU6050_init(I2C_HandleTypeDef *hi2c, uint8_t sampling_rate,
 				I2C_TIMEOUT);
 		// set up low pass filter (pre-installed)
 		temp = 0x05;
-		HAL_I2C_Mem_Write(MPU6050_hi2c, MPU6050_ADR, LOW_PASS_FILTER_REG, 1, &temp, 1, I2C_TIMEOUT);
+		HAL_I2C_Mem_Write(MPU6050_hi2c, MPU6050_ADR, LOW_PASS_FILTER_REG, 1,
+				&temp, 1, I2C_TIMEOUT);
 
 	} else {
 		// endless loop
@@ -81,21 +82,51 @@ void MPU6050_getAccelValues(int16_t *acceleration) {
 	acceleration[2] = (int16_t) (Rec_Data[4] << 8 | Rec_Data[5]); // Z values
 }
 
+// gets angles from accel data and copies them into float array
+void MPU6050_getAccelAngles(float *angles) {
+	// init values
+	int16_t dataRaw[3];
+	float angles_accel_raw[3];
+
+	// get values
+	MPU6050_getAccelValues(dataRaw);
+
+	// from raw to G`s
+	for (uint8_t i = 0; i < 3; i++) {
+		angles_accel_raw[i] = (float) dataRaw[i] / 8192 - accel_offset[i];
+	}
+
+	// from G`s to angles (only x and y axis angles)
+	angles[0] = atan(
+			angles_accel_raw[1]
+					/ sqrt(
+							angles_accel_raw[0] * angles_accel_raw[0]
+									+ angles_accel_raw[2]
+											* angles_accel_raw[2])) * M_1_PI
+			* 180;
+	angles[1] = -atan(
+			angles_accel_raw[0]
+					/ sqrt(
+							angles_accel_raw[1] * angles_accel_raw[1]
+									+ angles_accel_raw[2]
+											* angles_accel_raw[2])) * M_1_PI
+			* 180;
+}
 // updates values of angles in given array if floats
 void MPU6050_updateAngles(float *angles, uint32_t tm) {
 	float temp = 0;
-	int16_t Rec_data_raw[3];
-	MPU6050_getGyroValues(Rec_data_raw);
-
-	for (uint8_t i = 0; i++; i < 3) {
-
-		temp = (float) (HAL_GetTick() - tm) * (Rec_data_raw[i] - gyro_offset[i])
-				/ 65500;
-		if (fabs(temp) > 0.001) {
-			angles[i] += temp;
-
-		}
-
-	}
+//	int16_t Rec_data_raw[3];
+//	MPU6050_getGyroValues(Rec_data_raw);
+//
+//	for (uint8_t i = 0; i++; i < 3) {
+//
+//		temp = (float) (HAL_GetTick() - tm) * (Rec_data_raw[i] - gyro_offset[i])
+//				/ 65500;
+//		if (fabs(temp) > 0.001) {
+//			angles[i] += temp;
+//
+//		}
+//
+//	}
 
 }

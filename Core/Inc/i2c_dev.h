@@ -29,9 +29,11 @@
 #define ACCEL_4G 0b00001000
 #define ACCEL_8G 0b00010000
 
-// functions
+//MPU6050 functions
 void MPU6050_init(I2C_HandleTypeDef *hi2c, uint8_t sampling_rate,  uint8_t guro_sens, uint8_t accel_sens);
 void MPU6050_getGyroValues(int16_t *angles);
 void MPU6050_getAccelValues(int16_t *acceleration);
+void MPU6050_getAccelAngles(float *angles);
+
 
 #endif /* INC_I2C_DEV_H_ */

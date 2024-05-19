@@ -1,2 +1,4 @@
 small_drone Debug.launch
 .settings/*
+/Debug
+
