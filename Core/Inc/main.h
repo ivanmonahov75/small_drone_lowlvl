@@ -62,6 +62,17 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+// define adresses for communication
+#define SEND_ANGLES 0
+#define GET_ANGLES 1
+
+#define SEND_SPEEDS 2
+#define GET_SPEEDS 3
+
+#define GET_SERVOS 4
+#define SEND_BATTERIES 5
+
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
